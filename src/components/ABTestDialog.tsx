@@ -36,7 +36,7 @@ export default function ABTestDialog() {
               Choose Experience Version
             </h2>
             <p className="text-gray-600 dark:text-gray-300 mb-6">
-              We're testing two different versions of our platform. Please select one to continue:
+              We&apos;re testing two different versions of our platform. Please select one to continue:
             </p>
             <div className="grid grid-cols-2 gap-4">
               <button
