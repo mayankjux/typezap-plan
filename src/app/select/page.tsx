@@ -30,169 +30,97 @@ type Grade = '4' | '5' | '6' | '7' | '8' | '9';
 
 const getSubjectsForGrade = (grade: Grade): Subject[] => {
   const basePricing = {
-    '4': {
-      math: { base: 99, advanced: 149, live: 50 },
-      science: { base: 149, advanced: 199, live: 50 },
-      english: { base: 99, advanced: 149, live: 50 },
-      history: { base: 99, advanced: 149, live: 50 },
-      geography: { base: 99, advanced: 149, live: 50 },
-      computers: { base: 149, advanced: 199, live: 50 },
-      languages: { base: 149, advanced: 199, live: 50 },
-      arts: { base: 99, advanced: 149, live: 50 },
-      music: { base: 129, advanced: 179, live: 50 }
-    },
-    '5': {
-      math: { base: 99, advanced: 149, live: 50 },
-      science: { base: 149, advanced: 199, live: 50 },
-      english: { base: 99, advanced: 149, live: 50 },
-      history: { base: 99, advanced: 149, live: 50 },
-      geography: { base: 99, advanced: 149, live: 50 },
-      computers: { base: 149, advanced: 199, live: 50 },
-      languages: { base: 149, advanced: 199, live: 50 },
-      arts: { base: 99, advanced: 149, live: 50 },
-      music: { base: 129, advanced: 179, live: 50 }
-    },
-    '6': {
-      math: { base: 129, advanced: 179, live: 75 },
-      science: { base: 179, advanced: 229, live: 75 },
-      english: { base: 129, advanced: 179, live: 75 },
-      history: { base: 129, advanced: 179, live: 75 },
-      geography: { base: 129, advanced: 179, live: 75 },
-      computers: { base: 179, advanced: 229, live: 75 },
-      languages: { base: 179, advanced: 229, live: 75 },
-      arts: { base: 129, advanced: 179, live: 75 },
-      music: { base: 149, advanced: 199, live: 75 }
-    },
-    '7': {
-      math: { base: 129, advanced: 179, live: 75 },
-      science: { base: 179, advanced: 229, live: 75 },
-      english: { base: 129, advanced: 179, live: 75 },
-      history: { base: 129, advanced: 179, live: 75 },
-      geography: { base: 129, advanced: 179, live: 75 },
-      computers: { base: 179, advanced: 229, live: 75 },
-      languages: { base: 179, advanced: 229, live: 75 },
-      arts: { base: 129, advanced: 179, live: 75 },
-      music: { base: 149, advanced: 199, live: 75 }
-    },
-    '8': {
-      math: { base: 149, advanced: 199, live: 100 },
-      science: { base: 199, advanced: 249, live: 100 },
-      english: { base: 149, advanced: 199, live: 100 },
-      history: { base: 149, advanced: 199, live: 100 },
-      geography: { base: 149, advanced: 199, live: 100 },
-      computers: { base: 199, advanced: 249, live: 100 },
-      languages: { base: 199, advanced: 249, live: 100 },
-      arts: { base: 149, advanced: 199, live: 100 },
-      music: { base: 169, advanced: 219, live: 100 }
-    },
-    '9': {
-      math: { base: 149, advanced: 199, live: 100 },
-      science: { base: 199, advanced: 249, live: 100 },
-      english: { base: 149, advanced: 199, live: 100 },
-      history: { base: 149, advanced: 199, live: 100 },
-      geography: { base: 149, advanced: 199, live: 100 },
-      computers: { base: 199, advanced: 249, live: 100 },
-      languages: { base: 199, advanced: 249, live: 100 },
-      arts: { base: 149, advanced: 199, live: 100 },
-      music: { base: 169, advanced: 219, live: 100 }
-    }
+    base: 499,
+    plus: 599,    // base + 100
+    advanced: 698, // base + 199
+    live: 0       // live class price can be set if needed
   };
 
   return [
     {
-      id: 'math',
-      name: 'Mathematics',
-      description: 'Algebra, Geometry, and Advanced Math concepts',
+      id: 'ai',
+      name: 'Artificial Intelligence',
+      description: 'Learn AI concepts, machine learning, and data analysis',
       plans: {
-        base: basePricing[grade].math.base,
-        advanced: basePricing[grade].math.advanced
+        base: basePricing.base,
+        advanced: basePricing.advanced
       },
-      liveClassPrice: basePricing[grade].math.live
+      liveClassPrice: basePricing.live
     },
     {
-      id: 'science',
-      name: 'Science',
-      description: 'Physics, Chemistry, and Biology fundamentals',
+      id: 'cybersafety',
+      name: 'Cybersafety',
+      description: 'Digital security, online safety, and cybersecurity fundamentals',
       plans: {
-        base: basePricing[grade].science.base,
-        advanced: basePricing[grade].science.advanced
+        base: basePricing.base,
+        advanced: basePricing.advanced
       },
-      liveClassPrice: basePricing[grade].science.live
+      liveClassPrice: basePricing.live
+    },
+    {
+      id: 'culture',
+      name: 'Indian Culture and History',
+      description: 'Indian heritage, traditions, and historical developments',
+      plans: {
+        base: basePricing.base,
+        advanced: basePricing.advanced
+      },
+      liveClassPrice: basePricing.live
+    },
+    {
+      id: 'hindi',
+      name: 'Hindi',
+      description: 'Hindi language skills, literature, and communication',
+      plans: {
+        base: basePricing.base,
+        advanced: basePricing.advanced
+      },
+      liveClassPrice: basePricing.live
     },
     {
       id: 'english',
-      name: 'English Language',
-      description: 'Reading comprehension, Writing skills, and Literature analysis',
+      name: 'English',
+      description: 'English language proficiency and literature',
       plans: {
-        base: basePricing[grade].english.base,
-        advanced: basePricing[grade].english.advanced
+        base: basePricing.base,
+        advanced: basePricing.advanced
       },
-      liveClassPrice: basePricing[grade].english.live
+      liveClassPrice: basePricing.live
     },
     {
-      id: 'history',
-      name: 'History',
-      description: 'World History, Civilizations, and Historical Analysis',
+      id: 'law',
+      name: 'Law and Life',
+      description: 'Legal awareness, civic responsibilities, and life skills',
       plans: {
-        base: basePricing[grade].history.base,
-        advanced: basePricing[grade].history.advanced
+        base: basePricing.base,
+        advanced: basePricing.advanced
       },
-      liveClassPrice: basePricing[grade].history.live
+      liveClassPrice: basePricing.live
     },
     {
-      id: 'geography',
-      name: 'Geography',
-      description: 'Physical Geography, Map Skills, and Environmental Studies',
+      id: 'gk',
+      name: 'G.K.',
+      description: 'General Knowledge, current affairs, and world awareness',
       plans: {
-        base: basePricing[grade].geography.base,
-        advanced: basePricing[grade].geography.advanced
+        base: basePricing.base,
+        advanced: basePricing.advanced
       },
-      liveClassPrice: basePricing[grade].geography.live
+      liveClassPrice: basePricing.live
     },
     {
-      id: 'computers',
-      name: 'Computer Science',
-      description: 'Programming, Digital Literacy, and Technology Skills',
+      id: 'problemsolving',
+      name: 'Problem Solving',
+      description: 'Critical thinking, analytical skills, and problem-solving techniques',
       plans: {
-        base: basePricing[grade].computers.base,
-        advanced: basePricing[grade].computers.advanced
+        base: basePricing.base,
+        advanced: basePricing.advanced
       },
-      liveClassPrice: basePricing[grade].computers.live
-    },
-    {
-      id: 'languages',
-      name: 'Foreign Languages',
-      description: 'Spanish, French, German, and other language options',
-      plans: {
-        base: basePricing[grade].languages.base,
-        advanced: basePricing[grade].languages.advanced
-      },
-      liveClassPrice: basePricing[grade].languages.live
-    },
-    {
-      id: 'arts',
-      name: 'Visual Arts',
-      description: 'Drawing, Painting, Art History, and Digital Art',
-      plans: {
-        base: basePricing[grade].arts.base,
-        advanced: basePricing[grade].arts.advanced
-      },
-      liveClassPrice: basePricing[grade].arts.live
-    },
-    {
-      id: 'music',
-      name: 'Music',
-      description: 'Music Theory, Instrument Basics, and Music Appreciation',
-      plans: {
-        base: basePricing[grade].music.base,
-        advanced: basePricing[grade].music.advanced
-      },
-      liveClassPrice: basePricing[grade].music.live
+      liveClassPrice: basePricing.live
     }
   ];
 };
 
-const SelectPage = () => {
+const SelectPageA = () => {
   const [selectedGrade, setSelectedGrade] = useState<Grade>('6');
   const [selectedSubjects, setSelectedSubjects] = useState<Map<string, SelectedSubject>>(new Map());
   const [showOptionsFor, setShowOptionsFor] = useState<string | null>(null);
@@ -245,23 +173,6 @@ const SelectPage = () => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
-      {/* Navigation Bar */}
-      <nav className="sticky top-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 z-50">
-        <div className="max-w-[1400px] mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/" className="text-xl font-semibold text-gray-900 dark:text-white">
-              LearnPlatform
-            </Link>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600 dark:text-gray-300">Starting from $99</span>
-              <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
-                Enroll Now
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
       <main className="max-w-[1400px] mx-auto px-4">
         {/* Product Title Section */}
         <section className="py-8 border-b border-gray-200 dark:border-gray-800">
@@ -324,18 +235,20 @@ const SelectPage = () => {
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Subjects Grid */}
             <div className="flex-1">
-              <div className="space-y-6">
+              <div className="space-y-5">
                 {subjects.map((subject) => (
                   <div 
                     key={subject.id}
-                    className={`bg-gray-50 dark:bg-gray-800 rounded-3xl p-8 hover:shadow-xl transition-all min-h-[160px] ${
+                    className={`bg-gray-50 dark:bg-gray-800 rounded-3xl px-8 pt-8 pb-4 hover:shadow-xl transition-all min-h-[160px] ${
                       selectedSubjects.has(subject.id) ? 'ring-2 ring-blue-500' : ''
                     }`}
                   >
                     <div className="flex justify-between items-start h-full">
                       <div className="flex-1">
-                        <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">{subject.name}</h3>
-                        <p className="text-gray-600 dark:text-gray-300 text-base max-w-xl leading-relaxed mb-4">{subject.description}</p>
+                        <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-1">{subject.name}</h3>
+                        <p className={`text-gray-600 dark:text-gray-300 text-base max-w-xl leading-relaxed ${selectedSubjects.has(subject.id) ? 'mb-4' : ''}`}>
+                          {subject.description}
+                        </p>
                         
                         {selectedSubjects.has(subject.id) ? (
                           <div className="space-y-4">
@@ -376,14 +289,14 @@ const SelectPage = () => {
                                   className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                                 >
                                   <div className="font-medium text-gray-900 dark:text-white">Base Plan</div>
-                                  <div className="text-sm text-gray-600 dark:text-gray-300">${subject.plans.base}/year</div>
+                                  <div className="text-sm text-gray-600 dark:text-gray-300">₹{subject.plans.base}/year</div>
                                 </button>
                                 <button
                                   onClick={() => selectSubjectPlan(subject.id, 'advanced')}
                                   className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                                 >
                                   <div className="font-medium text-gray-900 dark:text-white">Advanced Plan</div>
-                                  <div className="text-sm text-gray-600 dark:text-gray-300">${subject.plans.advanced}/year</div>
+                                  <div className="text-sm text-gray-600 dark:text-gray-300">₹{subject.plans.advanced}/year</div>
                                 </button>
                               </div>
                             )}
@@ -399,7 +312,7 @@ const SelectPage = () => {
             {/* Purchase Summary */}
             <div className="lg:w-[380px] xl:w-[420px]">
               <div className="sticky top-[calc(5vh+80px)] bg-gray-50 dark:bg-gray-800 rounded-3xl p-6 shadow-lg">
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                   <ShoppingCart className="w-5 h-5" />
                   Purchase Summary
                 </h3>
@@ -440,7 +353,7 @@ const SelectPage = () => {
                               </div>
                             </div>
                             <span className="font-medium text-gray-900 dark:text-white">
-                              ${planPrice + (selection.includeLiveClass ? subject.liveClassPrice : 0)}
+                              ₹{planPrice + (selection.includeLiveClass ? subject.liveClassPrice : 0)}
                             </span>
                           </div>
                         );
@@ -449,7 +362,7 @@ const SelectPage = () => {
                         <div className="flex justify-between items-center font-semibold">
                           <span className="text-gray-900 dark:text-white">Total</span>
                           <span className="text-gray-900 dark:text-white">
-                            ${calculateTotal()}
+                            ₹{calculateTotal()}
                           </span>
                         </div>
                       </div>
@@ -459,8 +372,8 @@ const SelectPage = () => {
                     </button>
                   </>
                 ) : (
-                  <div className="text-center text-gray-600 dark:text-gray-300">
-                    Select one or more subjects to see the summary
+                  <div className="text-gray-600 dark:text-gray-300">
+                    Select subjects to see the summary
                   </div>
                 )}
               </div>
@@ -562,4 +475,4 @@ const SelectPage = () => {
   );
 };
 
-export default SelectPage; 
+export default SelectPageA; 

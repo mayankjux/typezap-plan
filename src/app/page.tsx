@@ -3,6 +3,8 @@
 import { ChevronDown, CheckCircle2, ChevronRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import ABTestDialog from '@/components/ABTestDialog';
 
 const subjects = [
   {
@@ -69,6 +71,7 @@ interface CTAButtonProps {
 
 export default function Home() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showABDialog, setShowABDialog] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -105,7 +108,12 @@ export default function Home() {
           <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8">
             Access world-class education at your fingertips. Learn, grow, and succeed on your own terms.
           </p>
-          <CTAButton className="mx-auto" />
+          <button
+            onClick={() => setShowABDialog(true)}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full text-lg font-medium transition-colors"
+          >
+            Get Started
+          </button>
         </div>
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
           <ChevronDown className="h-8 w-8 text-gray-400" />
@@ -211,6 +219,8 @@ export default function Home() {
       >
         <CTAButton />
       </div>
+
+      {showABDialog && <ABTestDialog />}
     </div>
   );
 }
