@@ -34,13 +34,18 @@ export default {
         'fade-out': {
           '0%': { opacity: '1' },
           '100%': { opacity: '0' }
+        },
+        'scale-up': {
+          '0%': { transform: 'scale(0.8)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' }
         }
       },
       animation: {
         'fade-up': 'fade-up 0.5s ease-out forwards',
         'loading-bar': 'loading-bar 1.5s ease-in-out forwards',
         'fade-in': 'fade-in 0.3s ease-out forwards',
-        'fade-out': 'fade-out 0.3s ease-out forwards'
+        'fade-out': 'fade-out 0.3s ease-out forwards',
+        'scale-up': 'scale-up 0.5s ease-out forwards'
       }
     },
   },

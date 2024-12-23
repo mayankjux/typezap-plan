@@ -13,19 +13,6 @@
   --text-secondary: #4b5563;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --primary: #3b82f6;
-    --primary-hover: #60a5fa;
-    --secondary: #1f2937;
-    --secondary-hover: #374151;
-    --text-primary: #f9fafb;
-    --text-secondary: #9ca3af;
-  }
-}
-
 body {
   color: var(--text-primary);
   background: var(--background);
@@ -44,10 +31,10 @@ body {
   }
   
   .btn-secondary {
-    @apply bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 transition-colors duration-200;
+    @apply bg-gray-100 text-gray-900 hover:bg-gray-200 transition-colors duration-200;
   }
   
   .card {
-    @apply rounded-2xl bg-white dark:bg-gray-800 shadow-xl p-8;
+    @apply rounded-2xl bg-white shadow-xl p-8;
   }
 }

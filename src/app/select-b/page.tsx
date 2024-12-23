@@ -1,9 +1,9 @@
 "use client";
 
-import { HelpCircle, Info, Package, X } from "lucide-react";
+import { HelpCircle, Info, Package, X, Minus } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import FloatingHelpButton from "../components/FloatingHelpButton";
 
@@ -13,7 +13,7 @@ interface Subject {
   description: string;
   plans: {
     base: number;
-    plus: number;
+    advance: number;
     advanced: number;
   };
   liveClassPrice: number;
@@ -21,17 +21,17 @@ interface Subject {
 
 interface SelectedSubject {
   id: string;
-  planType: "base" | "plus" | "advanced" | null;
+  planType: "base" | "advance" | "advanced" | null;
   includeLiveClass: boolean;
+  liveClassDuration: "3" | "6" | "12" | null;
 }
 
 type Grade = "4" | "5" | "6" | "7" | "8" | "9";
 
 const getSubjectsForGrade = (grade: Grade): Subject[] => {
-  console.log("🚀 ~ getSubjectsForGrade ~ grade:", grade)
   const basePricing = {
     base: 499,
-    plus: 599, // base + 100
+    advance: 599, // base + 100
     advanced: 698, // base + 199
     live: 1299, // live class price per month
   };
@@ -43,7 +43,7 @@ const getSubjectsForGrade = (grade: Grade): Subject[] => {
       description: "Learn AI concepts, machine learning, and data analysis",
       plans: {
         base: basePricing.base,
-        plus: basePricing.plus,
+        advance: basePricing.advance,
         advanced: basePricing.advanced,
       },
       liveClassPrice: basePricing.live,
@@ -55,7 +55,7 @@ const getSubjectsForGrade = (grade: Grade): Subject[] => {
         "Digital security, online safety, and cybersecurity fundamentals",
       plans: {
         base: basePricing.base,
-        plus: basePricing.plus,
+        advance: basePricing.advance,
         advanced: basePricing.advanced,
       },
       liveClassPrice: basePricing.live,
@@ -66,7 +66,7 @@ const getSubjectsForGrade = (grade: Grade): Subject[] => {
       description: "Indian heritage, traditions, and historical developments",
       plans: {
         base: basePricing.base,
-        plus: basePricing.plus,
+        advance: basePricing.advance,
         advanced: basePricing.advanced,
       },
       liveClassPrice: basePricing.live,
@@ -77,7 +77,7 @@ const getSubjectsForGrade = (grade: Grade): Subject[] => {
       description: "Hindi language skills, literature, and communication",
       plans: {
         base: basePricing.base,
-        plus: basePricing.plus,
+        advance: basePricing.advance,
         advanced: basePricing.advanced,
       },
       liveClassPrice: basePricing.live,
@@ -88,7 +88,7 @@ const getSubjectsForGrade = (grade: Grade): Subject[] => {
       description: "English language proficiency and literature",
       plans: {
         base: basePricing.base,
-        plus: basePricing.plus,
+        advance: basePricing.advance,
         advanced: basePricing.advanced,
       },
       liveClassPrice: basePricing.live,
@@ -99,7 +99,7 @@ const getSubjectsForGrade = (grade: Grade): Subject[] => {
       description: "Legal awareness, civic responsibilities, and etiquettes",
       plans: {
         base: basePricing.base,
-        plus: basePricing.plus,
+        advance: basePricing.advance,
         advanced: basePricing.advanced,
       },
       liveClassPrice: basePricing.live,
@@ -110,7 +110,7 @@ const getSubjectsForGrade = (grade: Grade): Subject[] => {
       description: "General Knowledge, current affairs, and world awareness",
       plans: {
         base: basePricing.base,
-        plus: basePricing.plus,
+        advance: basePricing.advance,
         advanced: basePricing.advanced,
       },
       liveClassPrice: basePricing.live,
@@ -122,7 +122,7 @@ const getSubjectsForGrade = (grade: Grade): Subject[] => {
         "Critical thinking, analytical skills, and problem-solving techniques",
       plans: {
         base: basePricing.base,
-        plus: basePricing.plus,
+        advance: basePricing.advance,
         advanced: basePricing.advanced,
       },
       liveClassPrice: basePricing.live,
@@ -145,6 +145,7 @@ const SelectPageB = () => {
   // const [tooltipContent, setTooltipContent] = useState("");
   const [subjectToRemove, setSubjectToRemove] = useState<string | null>(null);
   const tooltipTimeout = useRef<NodeJS.Timeout>(null);
+  const [showDurationDropdown, setShowDurationDropdown] = useState<string | null>(null);
 
   const subjects = getSubjectsForGrade(selectedGrade);
 
@@ -161,7 +162,7 @@ const SelectPageB = () => {
 
   const selectSubjectPlan = (
     subjectId: string,
-    planType: "base" | "plus" | "advanced"
+    planType: "base" | "advance" | "advanced"
   ) => {
     const newSelection = new Map(selectedSubjects);
     const currentSelection = newSelection.get(subjectId);
@@ -169,6 +170,7 @@ const SelectPageB = () => {
       id: subjectId,
       planType,
       includeLiveClass: currentSelection?.includeLiveClass ?? false,
+      liveClassDuration: currentSelection?.liveClassDuration ?? "12"
     });
     setSelectedSubjects(newSelection);
     setShowOptionsFor(null);
@@ -181,6 +183,19 @@ const SelectPageB = () => {
       newSelection.set(subjectId, {
         ...current,
         includeLiveClass: !current.includeLiveClass,
+        liveClassDuration: !current.includeLiveClass ? "12" : null
+      });
+      setSelectedSubjects(newSelection);
+    }
+  };
+
+  const updateLiveClassDuration = (subjectId: string, duration: "3" | "6" | "12") => {
+    const newSelection = new Map(selectedSubjects);
+    const current = newSelection.get(subjectId);
+    if (current) {
+      newSelection.set(subjectId, {
+        ...current,
+        liveClassDuration: duration
       });
       setSelectedSubjects(newSelection);
     }
@@ -193,8 +208,8 @@ const SelectPageB = () => {
   //     const planPrice =
   //       selection.planType === "base"
   //         ? subject.plans.base
-  //         : selection.planType === "plus"
-  //         ? subject.plans.plus
+  //         : selection.planType === "advance"
+  //         ? subject.plans.advance
   //         : subject.plans.advanced;
   //     const liveClassPrice = selection.includeLiveClass
   //       ? subject.liveClassPrice
@@ -246,8 +261,8 @@ const SelectPageB = () => {
           price:
             selection.planType === "base"
               ? subject.plans.base
-              : selection.planType === "plus"
-              ? subject.plans.plus
+              : selection.planType === "advance"
+              ? subject.plans.advance
               : subject.plans.advanced,
           liveClassPrice: subject.liveClassPrice,
         };
@@ -277,8 +292,24 @@ const SelectPageB = () => {
     return `/images/${trimmedSubject.toLowerCase().replace(/\s+/g, "-")}.svg`;
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.duration-selector')) {
+        setShowDurationDropdown(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const getDurationText = (duration: string) => {
+    return duration === "12" ? "1 year" : `${duration} months`;
+  };
+
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
+    <div className="min-h-screen bg-white">
       {tooltipPosition.show &&
         createPortal(
           <div
@@ -313,19 +344,19 @@ const SelectPageB = () => {
 
       <main className="max-w-[1400px] mx-auto px-4">
         {/* Product Title Section */}
-        <section className="py-8 border-b border-gray-200 dark:border-gray-800">
+        <section className="py-8 border-b border-gray-200">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
-              <h1 className="text-4xl md:text-5xl font-semibold text-gray-900 dark:text-white">
+              <h1 className="text-4xl md:text-5xl font-semibold text-gray-900">
                 Choose your learning path
               </h1>
-              <p className="mt-2 text-lg text-gray-600 dark:text-gray-300">
+              <p className="mt-2 text-lg text-gray-600">
                 Select your grade and preferred learning plans
               </p>
             </div>
             <button
               onClick={scrollToComparison}
-              className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+              className="flex items-center gap-2 text-gray-600 hover:text-blue-500 transition-colors"
             >
               <HelpCircle className="w-5 h-5" />
               <span>Help me choose the best plan</span>
@@ -334,8 +365,8 @@ const SelectPageB = () => {
         </section>
 
         {/* Grade Selection Section */}
-        <section className="py-8 border-b border-gray-200 dark:border-gray-800">
-          <div className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white mb-6">
+        <section className="py-8 border-b border-gray-200">
+          <div className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-6">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white text-sm">
               1
             </span>
@@ -351,8 +382,8 @@ const SelectPageB = () => {
                   px-6 py-3 rounded-lg transition-all text-center
                   ${
                     selectedGrade === grade
-                      ? "bg-white dark:bg-gray-800 shadow-md border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400"
-                      : "bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-sm"
+                      ? "bg-white shadow-md border border-blue-200 text-blue-600"
+                      : "bg-white border border-gray-100 text-gray-500 hover:border-gray-200 hover:shadow-sm"
                   }
                 `}
               >
@@ -364,7 +395,7 @@ const SelectPageB = () => {
 
         {/* Subjects Selection Section */}
         <section className="py-12 relative">
-          <div className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white mb-8">
+          <div className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-8">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white text-sm">
               2
             </span>
@@ -386,23 +417,35 @@ const SelectPageB = () => {
                           id: subject.id,
                           planType: "base",
                           includeLiveClass: false,
+                          liveClassDuration: "12"
                         });
                         setSelectedSubjects(newSelection);
                       }
                     }}
-                    className={`bg-gray-50 dark:bg-gray-800 rounded-3xl px-8 pt-8 pb-4 transition-all duration-300 min-h-[160px] relative
+                    className={`bg-gray-50 rounded-3xl px-8 pt-8 pb-4 transition-all duration-300 min-h-[160px] relative
                       ${
                         selectedSubjects.has(subject.id) ||
                         showOptionsFor === subject.id
-                          ? "bg-white dark:bg-gray-800 shadow-md border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400"
-                          : "hover:shadow-xl cursor-pointer border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600"
+                          ? "bg-white shadow-md border border-blue-200 text-blue-600"
+                          : "hover:shadow-xl cursor-pointer border border-gray-100 hover:border-gray-200"
                       }
                     `}
                   >
+                    {selectedSubjects.has(subject.id) && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSubjectToRemove(subject.id);
+                        }}
+                        className="absolute top-4 right-4 p-1.5 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                      >
+                        <Minus className="w-4 h-4" />
+                      </button>
+                    )}
                     <div className="flex justify-between items-start h-full relative">
                       <div className="flex-1">
                         <div className="flex items-center gap-4 mb-2">
-                          <div className="w-12 h-12 bg-white dark:bg-gray-700 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
+                          <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
                             <Image
                               src={getImagePath(subject.name)}
                               alt={subject.name}
@@ -419,15 +462,15 @@ const SelectPageB = () => {
                               }}
                             />
                           </div>
-                          <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
+                          <h3 className="text-2xl font-semibold text-gray-900">
                             {subject.name}
-                            <span className="text-lg font-normal text-gray-500 ml-2">
-                              from ₹{subject.plans.base}/year
+                            <span className="text-base font-normal text-gray-500 ml-2">
+                              from ₹{subject.plans.base} with lifetime access
                             </span>
                           </h3>
                         </div>
                         <p
-                          className={`text-gray-600 dark:text-gray-300 text-base max-w-xl leading-relaxed ${
+                          className={`text-gray-600 text-base max-w-xl leading-relaxed ${
                             selectedSubjects.has(subject.id) ||
                             showOptionsFor === subject.id
                               ? "mb-4"
@@ -450,40 +493,38 @@ const SelectPageB = () => {
                                   ${
                                     selectedSubjects.get(subject.id)
                                       ?.planType === "base"
-                                      ? "bg-white dark:bg-gray-800 border-2 border-blue-500 text-blue-500 dark:text-blue-400"
+                                      ? "bg-white border-2 border-blue-500 text-blue-500"
                                       : showOptionsFor === subject.id
-                                      ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-300 border-2 border-blue-200 dark:border-blue-800"
-                                      : "bg-[#F9FAFB] dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
+                                      ? "bg-blue-50 text-blue-600 border-2 border-blue-200"
+                                      : "bg-[#F9FAFB] text-gray-600 hover:bg-gray-50"
                                   }
                                 `}
                               >
                                 <div className="relative z-10 w-full text-center">
                                   <div className="font-medium">No Add-ons</div>
-                                  <div className="text-sm opacity-90"></div>
                                 </div>
                               </button>
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  selectSubjectPlan(subject.id, "plus");
+                                  selectSubjectPlan(subject.id, "advance");
                                 }}
                                 className={`px-4 py-3 rounded-xl text-center transition-all relative overflow-hidden h-[100px] flex flex-col justify-center
                                   ${
                                     selectedSubjects.get(subject.id)
-                                      ?.planType === "plus"
-                                      ? "bg-white dark:bg-gray-800 border-2 border-blue-500 text-blue-500 dark:text-blue-400"
-                                      : "bg-[#F9FAFB] dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
+                                      ?.planType === "advance"
+                                      ? "bg-white border-2 border-blue-500 text-blue-500"
+                                      : "bg-[#F9FAFB] text-gray-600 hover:bg-gray-50"
                                   }
                                 `}
                               >
                                 <div className="relative z-10 w-full text-center">
-                                  <div className="font-medium">Plus</div>
+                                  <div className="font-medium">Advance</div>
                                   <div className="text-sm opacity-90">
-                                    Bonus practice questions
+                                    Bonus content and regular updates
                                   </div>
                                   <div className="text-xs mt-1">
-                                    +₹{subject.plans.plus - subject.plans.base}
-                                    /year
+                                    +₹{subject.plans.advance - subject.plans.base}
                                   </div>
                                 </div>
                               </button>
@@ -496,15 +537,15 @@ const SelectPageB = () => {
                                   ${
                                     selectedSubjects.get(subject.id)
                                       ?.planType === "advanced"
-                                      ? "bg-white dark:bg-gray-800 border-2 border-blue-500 text-blue-500 dark:text-blue-400"
-                                      : "bg-[#F9FAFB] dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
+                                      ? "bg-white border-2 border-blue-500 text-blue-500"
+                                      : "bg-[#F9FAFB] text-gray-600 hover:bg-gray-50"
                                   }
                                 `}
                               >
                                 <div className="relative w-full text-center">
                                   <div className="font-medium">Pro</div>
                                   <div className="text-sm opacity-90">
-                                    Plus + Level 2 prep content
+                                    Advance + Level 2 prep content
                                     <span className="inline-flex items-center justify-center">
                                       <div
                                         className="relative ml-1"
@@ -516,21 +557,15 @@ const SelectPageB = () => {
                                     </span>
                                   </div>
                                   <div className="text-xs mt-1">
-                                    +₹
-                                    {subject.plans.advanced -
-                                      subject.plans.base}
-                                    /year
+                                    +₹{subject.plans.advanced - subject.plans.base}
                                   </div>
                                 </div>
                               </button>
                             </div>
-                            <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                            <label className="flex items-center gap-2 text-sm text-gray-600">
                               <input
                                 type="checkbox"
-                                checked={
-                                  selectedSubjects.get(subject.id)
-                                    ?.includeLiveClass || false
-                                }
+                                checked={selectedSubjects.get(subject.id)?.includeLiveClass || false}
                                 onChange={(e) => {
                                   e.stopPropagation();
                                   toggleLiveClass(subject.id);
@@ -543,12 +578,62 @@ const SelectPageB = () => {
                                   e.preventDefault();
                                   scrollToComparison();
                                 }}
-                                className="text-blue-500 dark:text-blue-400 cursor-pointer -ml-1"
+                                className="text-blue-500 cursor-pointer -ml-1"
                               >
                                 Live Classes
                               </button>
+                              {selectedSubjects.get(subject.id)?.includeLiveClass && (
+                                <div className="flex items-center -ml-1">
+                                  <span>for&nbsp;</span>
+                                  <div className="relative duration-selector">
+                                    <div 
+                                      className="flex items-center gap-1 cursor-pointer hover:text-blue-500 transition-colors"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setShowDurationDropdown(showDurationDropdown === subject.id ? null : subject.id);
+                                      }}
+                                    >
+                                      <span className="text-gray-900">{getDurationText(selectedSubjects.get(subject.id)?.liveClassDuration || "12")}</span>
+                                      <svg
+                                        className={`w-4 h-4 text-gray-400 transition-transform ${showDurationDropdown === subject.id ? 'rotate-180' : ''}`}
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth="2"
+                                          d="M19 9l-7 7-7-7"
+                                        />
+                                      </svg>
+                                    </div>
+                                    {showDurationDropdown === subject.id && (
+                                      <div className="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[100px] z-10">
+                                        {["3", "6", "12"].map((duration) => (
+                                          <button
+                                            key={duration}
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              updateLiveClassDuration(subject.id, duration as "3" | "6" | "12");
+                                              setShowDurationDropdown(null);
+                                            }}
+                                            className={`w-full px-4 py-2 text-left hover:bg-gray-50 ${
+                                              selectedSubjects.get(subject.id)?.liveClassDuration === duration 
+                                                ? 'text-blue-500 font-medium' 
+                                                : 'text-gray-700'
+                                            }`}
+                                          >
+                                            {getDurationText(duration)}
+                                          </button>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
                               &nbsp;₹{subject.liveClassPrice}/month
-                              <span className="text-sm text-gray-500 dark:text-gray-400">
+                              <span className="text-sm text-gray-500">
                                 (Recommended)
                               </span>
                             </label>
@@ -563,8 +648,8 @@ const SelectPageB = () => {
 
             {/* Purchase Summary */}
             <div className="lg:w-[380px] xl:w-[420px]">
-              <div className="sticky top-[calc(5vh+80px)] bg-gray-50 dark:bg-gray-800 rounded-3xl p-6 shadow-lg">
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <div className="sticky top-[calc(5vh+80px)] bg-gray-50 rounded-3xl p-6 shadow-lg">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <Package className="w-5 h-5" />
                   Your Bundle
                 </h3>
@@ -572,7 +657,7 @@ const SelectPageB = () => {
                 {selectedSubjects.size > 0 ? (
                   <>
                     <div className="space-y-4 mb-6">
-                      <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300 mb-4">
+                      <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
                         <span>Selected Grade:</span>
                         <span className="font-medium">
                           Grade {selectedGrade}
@@ -595,12 +680,12 @@ const SelectPageB = () => {
                                     onClick={() =>
                                       setSubjectToRemove(subject.id)
                                     }
-                                    className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+                                    className="text-gray-400 hover:text-red-500 transition-colors"
                                   >
                                     <X className="w-4 h-4" />
                                   </button>
                                   <div>
-                                    <span className="text-gray-600 dark:text-gray-300">
+                                    <span className="text-gray-600">
                                       {subject.name}
                                     </span>
                                     <div className="text-sm text-gray-500">
@@ -608,9 +693,9 @@ const SelectPageB = () => {
                                         <>
                                           {selection.planType === "base"
                                             ? "No Add-ons"
-                                            : selection.planType === "plus"
-                                            ? "Plus Plan"
-                                            : "Level 2 Prep"}
+                                            : selection.planType === "advance"
+                                            ? "Advance"
+                                            : "Pro"}
                                           {selection.includeLiveClass &&
                                             " + Live Classes"}
                                         </>
@@ -634,7 +719,7 @@ const SelectPageB = () => {
                     </button>
                   </>
                 ) : (
-                  <div className="text-gray-600 dark:text-gray-300">
+                  <div className="text-gray-600">
                     Select subjects to see the summary
                   </div>
                 )}
@@ -647,11 +732,11 @@ const SelectPageB = () => {
         {subjectToRemove &&
           createPortal(
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-              <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-sm w-full mx-4 shadow-xl">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              <div className="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-xl">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
                   Remove Subject
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-6">
+                <p className="text-gray-600 mb-6">
                   Are you sure you want to remove{" "}
                   {subjects.find((s) => s.id === subjectToRemove)?.name} from
                   your bundle?
@@ -659,7 +744,7 @@ const SelectPageB = () => {
                 <div className="flex gap-3">
                   <button
                     onClick={() => setSubjectToRemove(null)}
-                    className="flex-1 px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    className="flex-1 px-4 py-2 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
                   >
                     Cancel
                   </button>
@@ -678,196 +763,213 @@ const SelectPageB = () => {
         {/* Plan Comparison Section */}
         <section
           id="plan-comparison"
-          className="py-16 border-t border-gray-200 dark:border-gray-800"
+          className="py-16 border-t border-gray-200"
         >
           <div className="max-w-[1400px] mx-auto px-4">
-            <h2 className="text-3xl font-semibold text-gray-900 dark:text-white text-center mb-2">
-              Choose Perfect Add-ons
-            </h2>
-            <p className="text-gray-600 dark:text-gray-300 text-center mb-12 max-w-2xl mx-auto">
-              Select what best fits your learning goals and aspirations
-            </p>
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <h2 className="text-4xl font-semibold text-gray-900 mb-4">
+                Choose Perfect Add-ons
+              </h2>
+              <p className="text-lg text-gray-600">
+                Select what best fits your learning goals and aspirations
+              </p>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Plus Plan */}
-              <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 border border-gray-200 dark:border-gray-700">
-                <div className="text-center mb-8">
-                  <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
-                    Plus
-                  </h3>
-                </div>
+            <div className="grid grid-cols-12 gap-6">
+              {/* Advance Plan */}
+              <div className="col-span-12 lg:col-span-6">
+                <div className="bg-white rounded-3xl p-8 lg:p-10 border border-gray-200 h-full">
+                  <div className="flex items-start gap-6 mb-8">
+                    <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-semibold text-gray-900 mb-2">
+                        Advance
+                      </h3>
+                      <p className="text-gray-500">Perfect for students looking to excel in their studies</p>
+                    </div>
+                  </div>
 
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3">
-                    <svg
-                      className="w-5 h-5 text-green-500 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      ></path>
-                    </svg>
-                    <span className="text-gray-700 dark:text-gray-300">
-                      Bonus content
-                    </span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <svg
-                      className="w-5 h-5 text-green-500 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      ></path>
-                    </svg>
-                    <span className="text-gray-700 dark:text-gray-300">
-                      Year-round updates
-                    </span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <svg
-                      className="w-5 h-5 text-green-500 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      ></path>
-                    </svg>
-                    <span className="text-gray-700 dark:text-gray-300">
-                      For students wanting additional practice and staying
-                      up-to-date
-                    </span>
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-4">
+                      <svg
+                        className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M5 13l4 4L19 7"
+                        ></path>
+                      </svg>
+                      <div>
+                        <h4 className="font-medium text-gray-900 mb-1">Bonus Content</h4>
+                        <p className="text-sm text-gray-600">Additional practice materials for enhanced learning</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <svg
+                        className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M5 13l4 4L19 7"
+                        ></path>
+                      </svg>
+                      <div>
+                        <h4 className="font-medium text-gray-900 mb-1">Year Round Updates</h4>
+                        <p className="text-sm text-gray-600">Stay up-to-date with new content throughout the year</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Pro Plan */}
-              <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 border border-gray-200 dark:border-gray-700">
-                <div className="text-center mb-8">
-                  <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
-                    Pro
-                  </h3>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3">
-                    <svg
-                      className="w-5 h-5 text-green-500 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      ></path>
-                    </svg>
-                    <span className="text-gray-700 dark:text-gray-300">
-                      Everything in Plus
-                    </span>
+              <div className="col-span-12 lg:col-span-6">
+                <div className="bg-white rounded-3xl p-8 lg:p-10 border border-gray-200 h-full">
+                  <div className="flex items-start gap-6 mb-8">
+                    <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-semibold text-gray-900 mb-2">
+                        Pro
+                      </h3>
+                      <p className="text-gray-500">For students aiming for excellence in ECO Olympiads</p>
+                    </div>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <svg
-                      className="w-5 h-5 text-green-500 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      ></path>
-                    </svg>
-                    <span className="text-gray-700 dark:text-gray-300">
-                      Ideal for advanced learners aiming to master
-                      Olympiad-level content
-                    </span>
+
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-4">
+                      <svg
+                        className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M5 13l4 4L19 7"
+                        ></path>
+                      </svg>
+                      <div>
+                        <h4 className="font-medium text-gray-900 mb-1">Everything in Advance</h4>
+                        <p className="text-sm text-gray-600">All bonus content and year round updates included</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <svg
+                        className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M5 13l4 4L19 7"
+                        ></path>
+                      </svg>
+                      <div>
+                        <h4 className="font-medium text-gray-900 mb-1">Level 2 Preparation Content</h4>
+                        <p className="text-sm text-gray-600">Advanced materials for ECO Olympiads preparation</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Live Classes */}
-              <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 border border-gray-200 dark:border-gray-700">
-                <div className="text-center mb-8">
-                  <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
-                    Live Classes
-                  </h3>
-                </div>
+              <div className="col-span-12 mt-8">
+                <div className="bg-blue-50 rounded-3xl p-8 lg:p-12 border border-blue-100 h-full">
+                  <div className="flex flex-col md:flex-row md:items-center gap-8 mb-10">
+                    <div className="flex items-center gap-6">
+                      <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center flex-shrink-0">
+                        <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-4 mb-2">
+                          <h3 className="text-3xl font-semibold text-gray-900">
+                            Live Classes
+                          </h3>
+                          <div className="flex items-center gap-2 bg-blue-100 rounded-full py-2 px-4">
+                            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span className="text-blue-600 font-medium">Monthly subscription</span>
+                          </div>
+                        </div>
+                        <p className="text-gray-600 text-lg">Interactive learning with expert teachers</p>
+                      </div>
+                    </div>
+                  </div>
 
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3">
-                    <svg
-                      className="w-5 h-5 text-green-500 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      ></path>
-                    </svg>
-                    <span className="text-gray-700 dark:text-gray-300">
-                      Weekly live classes
-                    </span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <svg
-                      className="w-5 h-5 text-green-500 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      ></path>
-                    </svg>
-                    <span className="text-gray-700 dark:text-gray-300">
-                      Doubt-solving sessions
-                    </span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <svg
-                      className="w-5 h-5 text-green-500 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      ></path>
-                    </svg>
-                    <span className="text-gray-700 dark:text-gray-300">
-                      Perfect for those seeking personal guidance and
-                      interaction with experts
-                    </span>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-white rounded-2xl p-6 shadow-sm">
+                      <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <svg
+                            className="w-5 h-5 text-blue-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M5 13l4 4L19 7"
+                            ></path>
+                          </svg>
+                        </div>
+                        <div>
+                          <h4 className="text-lg font-medium text-gray-900 mb-2">Weekly Live Sessions</h4>
+                          <p className="text-gray-600">Regular interactive classes with expert teachers to enhance your learning experience and keep you engaged</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-2xl p-6 shadow-sm">
+                      <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <svg
+                            className="w-5 h-5 text-blue-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            ></path>
+                          </svg>
+                        </div>
+                        <div>
+                          <h4 className="text-lg font-medium text-gray-900 mb-2">Doubt Solving</h4>
+                          <p className="text-gray-600">Get personalized attention and clear all your doubts through interactive sessions with subject experts</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -880,34 +982,34 @@ const SelectPageB = () => {
           <div className="max-w-[1400px] mx-auto px-4">
             <div className="flex items-center justify-center gap-3 mb-2">
               <HelpCircle className="w-8 h-8 text-blue-500" />
-              <h2 className="text-3xl font-semibold text-gray-900 dark:text-white text-center">
+              <h2 className="text-3xl font-semibold text-gray-900 text-center">
                 Frequently Asked Questions
               </h2>
             </div>
-            <p className="text-gray-600 dark:text-gray-300 text-center mb-12 max-w-2xl mx-auto">
+            <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
               Find answers to common questions about our learning plans and
               features
             </p>
 
             <div className="max-w-3xl mx-auto space-y-6">
               {/* FAQ Item */}
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                  What&apos;s included in the Plus add-on?
+              <div className="bg-white border border-gray-200 rounded-2xl p-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  What&apos;s included in the Advance add-on?
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300">
-                  The Plus add-on includes bonus practice content, regular
+                <p className="text-gray-600">
+                  The Advance add-on includes bonus practice content, regular
                   updates throughout the year, and additional learning materials
                   to help you stay ahead in your studies.
                 </p>
               </div>
 
               {/* FAQ Item */}
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              <div className="bg-white border border-gray-200 rounded-2xl p-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
                   How do the live classes work?
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-gray-600">
                   Live classes are conducted weekly by expert teachers. You&apos;ll
                   join interactive sessions where you can ask questions in
                   real-time, participate in discussions, and get personalized
@@ -916,23 +1018,23 @@ const SelectPageB = () => {
               </div>
 
               {/* FAQ Item */}
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                  What makes the Pro add-on different from Plus?
+              <div className="bg-white border border-gray-200 rounded-2xl p-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  What makes the Pro add-on different from Advance?
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300">
-                  The Pro add-on includes everything in Plus and adds advanced
+                <p className="text-gray-600">
+                  The Pro add-on includes everything in Advance and adds advanced
                   Olympiad-level content, making it perfect for students aiming
                   to excel in competitive exams and master advanced concepts.
                 </p>
               </div>
 
               {/* FAQ Item */}
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              <div className="bg-white border border-gray-200 rounded-2xl p-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
                   Can I switch between add-ons later?
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-gray-600">
                   Yes, you can upgrade or modify your add-ons at any time. Your
                   learning progress and materials will be preserved when you
                   switch between plans.
@@ -940,11 +1042,11 @@ const SelectPageB = () => {
               </div>
 
               {/* FAQ Item */}
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              <div className="bg-white border border-gray-200 rounded-2xl p-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
                   How do doubt-solving sessions work?
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-gray-600">
                   Doubt-solving sessions are dedicated times where you can get
                   one-on-one help from our expert teachers. You can ask specific
                   questions about topics you&apos;re struggling with and receive
@@ -959,7 +1061,7 @@ const SelectPageB = () => {
         <div className="flex justify-center pb-16">
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="group flex items-center gap-2 px-6 py-3 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded-full border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-500 dark:hover:text-blue-400 transition-all"
+            className="group flex items-center gap-2 px-6 py-3 bg-white text-gray-600 rounded-full border border-gray-200 hover:border-blue-500 hover:text-blue-500 transition-all"
           >
             <svg
               className="w-5 h-5 transform group-hover:-translate-y-1 transition-transform"
